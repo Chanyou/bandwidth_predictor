@@ -82,6 +82,8 @@ def composeFile():
     idx = 0
     while len(movDataList) > idx :
         currentTime = movDataList[idx].timestamp
+        print 'cTime : '
+        print currentTime
         APID = movDataList[idx].APID
         if len(movDataList) == idx + 1:
             nextMovement = 99999999
