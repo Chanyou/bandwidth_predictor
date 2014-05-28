@@ -51,6 +51,7 @@ def composeFile():
         line = movData.readline()
         if not line:
             break
+        print line
         elems = line.split()
         #time APID
         timestamp = int(elems[0])
