@@ -88,7 +88,7 @@ def composeFile():
         else :
             nextMovement = movDataList[idx+1].timestamp
         if not thruData.has_key(movDataList[idx].APID) :
-            write(currenttTime, throughputLimit)
+            write(currentTime, throughputLimit)
         else :
             llen = len(thruData[movDataList[idx].APID])
             tidx = -1
