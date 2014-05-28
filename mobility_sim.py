@@ -62,6 +62,7 @@ def composeFile():
         line = tData.readline()
         if not line:
             break
+        print line
         elems = line.split()
         #time APID Throughput
         timestamp = int(elems[0])
