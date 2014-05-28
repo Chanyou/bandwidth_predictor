@@ -65,13 +65,85 @@ lastinterval = -1
 lastbw = 0
 b = 0
 #givendata = []
+movDataList = []
+thruData = {}
+throughputHistoryLoc = ''
+movDataLoc = ''
+alpha = 0.1
+
+def getCurrentAP() :
+    global currentAP, currenttime,movDataList
+    idx = 1
+    while len(movDataList) > idx :
+        if movDataList[idx].timestamp > currenttime :
+            break
+        idx = idx + 1
+    currentAP = movDayaList[idx - 1].APID
+    
+    return currentAP
+def predict(windowsize):
+    global currentAP, currenttime, alpha, thruData
+    currentAP = getCurrentAP()
+    alen = len(thruData[currentAP])
+    res = -1
+    for i in range(0, alen) :
+        if (thruData[currentAP][i].timestamp >= currenttime - windowsize) & (thruData[currentAP][i].timestamp <= currenttime) :
+            if res < 0 :
+                res = thruData[currentAP][i].throughput
+            else :
+                res = res *(1- alpha) + thruData[currentAP][i].throughput * alpha
+            
+    return res
+    
+
+def readFile():
+    global movDataLoc, throughputHistoryLoc, movDataList, outputFileLoc, f;
+    global thruData, movDataList
+    
+    if len(sys.argv) < 10 :
+        print '<output location> <movement data> <throughput history data>'
+        exit(-1)
+    
+    movDataLoc = sys.argv[8]
+    throughputHistoryLoc = sys.argv[9]
+
+
+    
+    movData = open(movDataLoc)
+    tData = open(throughputHistoryLoc)
+    #read Mobility data
+    while True:
+        line = movData.readline()
+        if not line:
+            break
+        elems = line.split()
+        #time APID
+        timestamp = int(elems[0])
+        APID = elems[1]
+        movDataList.append(MobilityHistory(timestamp, APID))
+    #read Throughput data
+    while True:
+        line = tData.readline()
+        if not line:
+            break
+        elems = line.split()
+        #time APID Throughput
+        timestamp = int(elems[0])
+        APID = elems[1]
+        thru = int(elems[2])
+        if thruData.has_key(APID):
+            thruData[APID].append(ThroughputHistory(timestamp,APID,thru))
+        else :
+            thruData[APID] = []
+            thruData[APID].append(ThroughputHistory(timestamp,APID,thru))
+
 
 #By JSH
-def read_networkdata():  #This function will be executed in start_server()
+def read_eventdata():  #This function will be executed in start_server()
     global timelist, bpslist, listlen, lastbw
     time = 0
     #print("read_networkdata call")
-    f = open("/home/proj3/bitrate-project-starter/topos/topo1/topo1.events", 'r')
+    f = open("events.events", 'r')
 
     #test
     timelist.append(0)
@@ -125,7 +197,12 @@ def getBR():
         else:
             break
     #print "BR: ", bpslist[index], "current time: ", currenttime
-    return bpslist[index]
+    bw = predict(5)
+    b = 10
+    for i in BR:
+        if i * 1.5 <= bw:
+            b = i
+    return b
 
 class ConnectionHandler:
     def __init__(self, connection, address, timeout):
@@ -234,9 +311,10 @@ def start_server(timeout=5, handler=ConnectionHandler):
     INNER_IP = sys.argv[4]
     DNS_IP = sys.argv[5]
     DNS_PORT = int(float(sys.argv[6]))
-    if len(sys.argv) == 8:
+    if len(sys.argv) >= 8:
         RR_ADDR = sys.argv[7]
-        
+
+    
     v = open('/var/www/vod/big_buck_bunny.f4m').read()
     vi = [m.start() for m in re.finditer('bitrate=',v)]
     for i in vi:
@@ -245,7 +323,10 @@ def start_server(timeout=5, handler=ConnectionHandler):
     #print BR
     AVG = BR[0]
     
-    read_networkdata()  #By JSH
+    read_eventdata()  #By JSH
+
+    readFile()
+    
     port = int(float(sys.argv[3]))
     soc = socket.socket(socket.AF_INET)
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -259,3 +340,20 @@ def start_server(timeout=5, handler=ConnectionHandler):
 if __name__ == '__main__':
     start_server()
 
+class ThroughputHistory:
+    timestamp = 0
+    APID = ""
+    throughput = 0
+    def __init__(self, time, ap, th):
+        self.timestamp = time
+        self.APID = ap
+        self.throughput = th
+  
+        
+        
+class MobilityHistory:
+    timestamp = 0
+    APID= ""
+    def __init__(self, time, ap):
+        self.timestamp = time
+        self.APID = ap

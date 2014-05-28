@@ -1,0 +1,36 @@
+#Throughput composer
+#
+#Mobility --> Throughput
+#
+
+import sys
+import thread, random, re
+
+movDataLoc = ""
+# Time \t APID
+throughputHistoryLoc = ""
+# Time \t APID \t Throughput
+
+class ThroughputHistory
+    timestamp = 0
+    APID = ""
+    throughput = 0
+    def __init__(self, time, ap, th)
+        self.timestamp = time
+        self.APID = ap
+        self.throughput = th
+        
+
+def composeFile():
+    global movDataLoc, throughputHistoryLoc;
+    if len(sys.argv) < 2 :
+        print '<movement data> <throughput history data>'
+        exit(-1)
+    movDataLoc = sys.argv[1]
+    throughputHistoryLoc = sys.argv[2]
+    
+    #read into array
+
+    #find proper throughput value
+
+    # write data
