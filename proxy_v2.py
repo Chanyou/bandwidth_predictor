@@ -165,7 +165,7 @@ def getBR():
         else:
             break
     #print "BR: ", bpslist[index], "current time: ", currenttime
-    bw = predict(5)
+    bw = predict(20)
     b = 10
     for i in BR:
         if i * 1.5 <= bw:
