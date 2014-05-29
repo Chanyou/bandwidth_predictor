@@ -170,6 +170,8 @@ def getBR():
     for i in BR:
         if i * 1.5 <= bw:
             b = i
+	print 'predicted bw : '
+	print b
     return b
 
 class ConnectionHandler:
