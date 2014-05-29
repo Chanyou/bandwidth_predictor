@@ -71,6 +71,22 @@ throughputHistoryLoc = ''
 movDataLoc = ''
 alpha = 0.1
 
+class ThroughputHistory:
+    timestamp = 0
+    APID = ""
+    throughput = 0
+    def __init__(self, time, ap, th):
+        self.timestamp = time
+        self.APID = ap
+        self.throughput = th
+          
+class MobilityHistory:
+    timestamp = 0
+    APID= ""
+    def __init__(self, time, ap):
+        self.timestamp = time
+        self.APID = ap
+        
 def getCurrentAP() :
     global currentAP, currenttime,movDataList
     idx = 1
@@ -138,55 +154,7 @@ def readFile():
             thruData[APID].append(ThroughputHistory(timestamp,APID,thru))
 
 
-#By JSH
-def read_eventdata():  #This function will be executed in start_server()
-    global timelist, bpslist, listlen, lastbw
-    time = 0
-    #print("read_networkdata call")
-    f = open("events.events", 'r')
 
-    #test
-    timelist.append(0)
-    bpslist.append(1000)
-
-    while True:
-        line = f.readline()
-        if not line:
-            break
-        if line[0] == '#':
-            continue
-        if line[0] == '\n':
-            continue
-        #print line
-        #Read time and store it
-
-
-        linelist = line.split()
-        time += int(linelist[0])
-        timelist.append(time + 45)
-        digit = 0
-        while True:
-            if linelist[2][digit].isdigit():
-                digit += 1
-            else:
-                break
-        bps = int(linelist[2][0:digit])
-        
-        #Read BW and store it
-        if linelist[2][digit] == 'k':
-            bps *= 1
-        elif linelist[2][digit] == 'm':
-            bps *= 1000
-        b = 10
-
-        for i in BR:
-            if i * 1.5 <= bps:
-                b = i
-        bpslist.append(b)
-    listlen = len(timelist)
-    lastbw = bpslist[0]
-    #print timelist, bpslist, listlen, lastbw
-    f.close()
 
 def getBR():
     global currenttime, index
@@ -340,20 +308,4 @@ def start_server(timeout=5, handler=ConnectionHandler):
 if __name__ == '__main__':
     start_server()
 
-class ThroughputHistory:
-    timestamp = 0
-    APID = ""
-    throughput = 0
-    def __init__(self, time, ap, th):
-        self.timestamp = time
-        self.APID = ap
-        self.throughput = th
-  
-        
-        
-class MobilityHistory:
-    timestamp = 0
-    APID= ""
-    def __init__(self, time, ap):
-        self.timestamp = time
-        self.APID = ap
+
