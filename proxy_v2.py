@@ -323,7 +323,7 @@ def start_server(timeout=5, handler=ConnectionHandler):
     #print BR
     AVG = BR[0]
     
-    read_eventdata()  #By JSH
+    #read_eventdata()  #By JSH
 
     readFile()
     
